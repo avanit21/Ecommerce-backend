@@ -20,8 +20,8 @@ router.post("/signin",[
 ], signin);
 //router.get("/signin", signin);
 
-router.get("/testroute", isSignedIn, (req,res) => {
+router.get("/signout", isSignedIn, (req,res) => {
     res.json(req.auth);
-})
+},signout);
 
 module.exports = router;
