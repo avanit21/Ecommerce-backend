@@ -30,6 +30,9 @@ const productSchema = new mongoose.Schema({
     stock: {
         type: Number
     },
+    quentity: {
+        type: Number
+    },
     sold: {
         type: Number,
         default: 0

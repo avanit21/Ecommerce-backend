@@ -19,7 +19,7 @@ exports.makepayment = (req, res) => {
         .create(
           {
             amount: amount * 100,
-            currency: "usd",
+            currency: "inr",
             customer: customer.id,
             receipt_email: token.email,
             description: `Purchased the product`,
