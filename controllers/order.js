@@ -41,14 +41,29 @@ exports.getAllOrders = (req,res) => {
     })
 }
 
+exports.getOrder = (req,res) =>{
+    Order.find(req.order).populate("user", "_id name").exec((err,order) => {
+        if(err){
+            res.status(400).json({
+                error: "No orders found"
+            })
+        }
+
+        res.json(order)
+    })
+    
+    //return res.json(req.order.populate("user", "name"));
+}
+
 
 exports.getOrderStatus = (req,res) => {
     res.json(Order.schema.path("status").enumValues);
 }
 
 exports.updateStatus = (req,res) => {
+    
     Order.update(
-        {_id: req.body.orderId},
+        {_id: req.order._id},
         {$set: {status: req.body.status}},
         (err,order) => {
             if(err){
@@ -60,3 +75,5 @@ exports.updateStatus = (req,res) => {
         }
     )
 }
+
+
