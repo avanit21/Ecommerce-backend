@@ -77,3 +77,25 @@ exports.updateStatus = (req,res) => {
 }
 
 
+exports.getUserOrder = (req,res) => {
+    const orders=[];
+    Order.find().populate("user").exec((err,order) => {
+        if(err){
+            res.status(400).json({
+                error: "No orders found"
+            })
+        }
+        else
+        {
+            order.map((ord,index) => {                    
+                
+                if(JSON.stringify(ord.user._id)==JSON.stringify(req.profile._id))
+                {
+                    
+                    orders.push(ord)
+                }
+            })   
+        }
+        res.json(orders)
+    })
+}

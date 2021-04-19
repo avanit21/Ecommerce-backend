@@ -2,9 +2,9 @@ const express = require("express")
 const router = express.Router();
 
 const {isSignedIn, isAuthenticated, isAdmin} =require("../controllers/auth");
-const {getUserById, pushOrderInPurchaseList} =require("../controllers/user");
+const {getUserById, pushOrderInPurchaseList, getUser} =require("../controllers/user");
 
-const {getOrderById, createOrder, getAllOrders,getOrderStatus,updateStatus, getOrder} = require("../controllers/order");
+const {getOrderById, createOrder, getAllOrders,getOrderStatus,updateStatus, getOrder, getUserOrder} = require("../controllers/order");
 
 const {updateStock} = require("../controllers/product");
 
@@ -21,6 +21,7 @@ router.post("/order/create/:userId", isSignedIn, isAuthenticated, pushOrderInPur
 //read
 router.get("/order/all/:userId", isSignedIn, isAuthenticated, isAdmin, getAllOrders);
 router.get("/order/:orderId", getOrder);
+router.get("/user/order/:userId", isSignedIn, isAuthenticated,getUserOrder);
 
 
 //status of order
