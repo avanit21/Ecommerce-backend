@@ -42,7 +42,7 @@ exports.getAllOrders = (req,res) => {
 }
 
 exports.getOrder = (req,res) =>{
-    Order.find(req.order).populate("user", "_id name").exec((err,order) => {
+    Order.find(req.order).populate("user", "_id name email").exec((err,order) => {
         if(err){
             res.status(400).json({
                 error: "No orders found"
