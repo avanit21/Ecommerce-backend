@@ -59,8 +59,8 @@ exports.signin = (req, res) => {
         res.cookie("token", token, {expire: new Date() + 9999})
 
         // send response to frontend
-        const {_id, name, email, role,purchases} = user;
-        return res.json({token, user: {_id, name, email, role,purchases}})
+        const {_id, name, email, role} = user;
+        return res.json({token, user: {_id, name, email, role}})
 
     })
 };
@@ -83,6 +83,7 @@ exports.isSignedIn = expressJwt({
 
 //custom middlewares
 exports.isAuthenticated = (req, res, next) => {
+    
     let checker = req.profile && req.auth && req.profile._id == req.auth._id;
     if(!checker){
         return res.status(403).json({

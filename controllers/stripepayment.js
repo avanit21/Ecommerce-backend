@@ -6,7 +6,7 @@ exports.makepayment = (req, res) => {
 
   let amount = 0;
   products.map(p => {
-    amount = amount + p.price;
+    amount = amount + [p.price*p.count];
   });
   const idempotencyKey = uuid();
   return stripe.customers

@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Order = require("../models/order");
 
+
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if(err || !user)
@@ -24,23 +25,24 @@ exports.getUser = (req, res) => {
     return res.json(req.profile);
 }
 
-exports.updateUser = (req, res) => {
+exports.updateUserPassword = (req, res) => {
+    
+    const user = new User(req.profile);
     User.findByIdAndUpdate(
+        
         {_id: req.profile._id},
-        {$set: req.body},
+        {$set: {encry_password:user.securePassword(req.body.password)}},            
         {new: true, useFindAndModify: false},
         (err, user) => {
+
             if(err || !user)
             {
                 return res.status(400).json({
                     error: "You are not authorize to update this user"
                 })
             }
-            user.salt = undefined;
-            user.encry_password = undefined;
-            user.createdAt = undefined;
-            user.updatedAt = undefined;
-            res.json(user)
+            res.json("password success fully updated")
+            
         }
     )
 }
@@ -93,3 +95,4 @@ exports.pushOrderInPurchaseList = (req, res, next) => {
 
     next();
 }
+
