@@ -197,7 +197,7 @@ exports.updatePasswordLink = (req,res) => {
             const content=`
             <h1>Hello</h1>
             <p>Please click link below to Forgot your account</p>
-            <a href=http://localhost:3000/forgotpassword/${user._id}/${user.uniqueString}> Forgot Your Password </a>`
+            <a href=http://localhost:3000/forgotpassword/${user._id}/${user.uniqueString}> Change Your Password </a>`
             sendEmail(email,subject,content);
 
             
