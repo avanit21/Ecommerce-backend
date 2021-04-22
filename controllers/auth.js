@@ -2,8 +2,60 @@ const User = require("../models/user");
 const { check, validationResult } = require('express-validator');
 var jwt = require('jsonwebtoken');
 var expressJwt = require("express-jwt");
+require('dotenv').config()
 
-exports.signup = (req, res) => {
+const nodemailer=require('nodemailer');
+const { response } = require("express");
+const crypto = require('crypto');
+
+
+
+
+const sendEmail = (email,subject,content) => {
+    const Transport= nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.User,
+            pass: process.env.password
+        }
+    })
+    var mailOption;
+    const sender = process.env.User;
+    mailOption={
+        to:email,
+        from:sender,
+        subject:subject,
+        html:content
+    };
+
+    Transport.sendMail(mailOption,(err,response) => {
+        if(err){
+            console.log(err)
+            
+        }
+        else{
+            
+            console.log("success");
+        }
+    })
+}
+
+exports.verify =  async (req,res) => {
+    const {uniqueString} = req.params;
+
+    const user = await User.findOne({uniqueString:uniqueString});
+    if(user){
+        user.isValid=true;
+        await user.save();
+        res.json("you are successfuly verified");
+
+    }
+    else{
+        res.json("user not found")
+    }
+}
+
+exports.signup = async(req, res) => {
     const errors = validationResult(req)
 
     if(!errors.isEmpty())
@@ -12,22 +64,39 @@ exports.signup = (req, res) => {
             error: errors.array()[0].msg
         })
     }
-
-    const user = new User(req.body)
-    user.save((err, user) => {
-        if(err){
+    const {email}=req.body;
+    const user = new User(req.body);
+    User.findOne({email}, async(err, userr) =>{
+        
+        if(userr){
+          
+            //console.log(flag)
             return res.status(400).json({
-                err: "Not able to save user in DB"
-            });
+                error: "You have alredy account in this email. Please go to login"
+            })
+            
         }
-
-        res.json({
-            name: user.name,
-            email: user.email,
-            id: user._id
-        });
+        else
+        {
+            user.uniqueString = crypto.randomBytes(64).toString('hex');
+            user.isValid=false;
+            await user.save();
+            const subject="Email confirmation";
+            const content=`
+            <h1>Hello</h1>
+            <p>Thanks for registering on Our Site.</p>
+            <p>Please click link below to verify your account</p>
+            <a href=http://localhost:8000/api/verify/${user.uniqueString}> Verify your Account </a>`
+            sendEmail(email,subject,content);
+            return res.json("Thanks for registering. Please Check your mail to verify account")
+        }
     })
+    
+    
+    
 };
+
+
 
 exports.signin = (req, res) => {
     const {email, password} = req.body;
@@ -49,6 +118,13 @@ exports.signin = (req, res) => {
         if(!user.autheticate(password)){
             return res.status(401).json({
                 error: "Email and password not match"
+            })
+        }
+
+        if(!user.isValid)
+        {
+            return res.status(401).json({
+                error: "You not verify your account.Please Check your mail to verify youe account"
             })
         }
 
@@ -101,3 +177,72 @@ exports.isAdmin = (req, res, next) => {
     }
     next();
 }
+
+exports.updatePasswordLink = (req,res) => {
+    const {email}=req.body;
+    User.findOne({email}, async(err, user) =>{
+        
+        if(err || !user){
+          
+            //console.log(flag)
+            return res.status(400).json({
+                error: "User is not exsist"
+            });
+            
+        }
+        else
+        {
+
+            const subject="Forgot Password";
+            const content=`
+            <h1>Hello</h1>
+            <p>Please click link below to Forgot your account</p>
+            <a href=http://localhost:3000/forgotpassword/${user._id}/${user.uniqueString}> Forgot Your Password </a>`
+            sendEmail(email,subject,content);
+
+            
+            return res.json("Verify Password Link is send to Your register email")                      
+        }      
+
+    })     
+}
+
+exports.forgotPassword = (req,res)=> {
+    
+    const {userId,uniqueString}=req.params;
+    User.findOne({_id:userId}, (err, user) => {
+        if(err || !user){
+            console.log(err)
+            return res.status(400).json({
+                error: "User is "
+            })
+        }
+        if(uniqueString==user.uniqueString)
+        {
+            User.updateOne(
+                {_id:userId},
+                {$set:{encry_password:user.securePassword(req.body.password)}},
+                {new: true, useFindAndModify: false},
+                (err, response) => {
+    
+                    if(err)
+                    {
+                        return res.status(400).json({
+                            error: "You are not authorize to update this user"
+                        })
+                    }
+                    return res.json("password success fully updated")
+                    
+                }
+            )
+        }
+        else{
+            return res.status(400).json({
+                error: "You are not authorize to update this user"
+            })
+        }
+        
+    })
+    
+}
+

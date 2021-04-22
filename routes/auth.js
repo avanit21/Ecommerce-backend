@@ -2,7 +2,7 @@ const { response } = require('express');
 var express = require('express')
 var router = express.Router()
 const { check, validationResult } = require('express-validator');
-const {signout, signup, signin, isSignedIn} = require("../controllers/auth");
+const {signout, signup, signin, isSignedIn, verify, updatePasswordLink, forgotPassword} = require("../controllers/auth");
 
 
 
@@ -14,6 +14,8 @@ router.post("/signup",[
 ], signup);
 //router.get("/signup", signup);
 
+router.get("/verify/:uniqueString",verify)
+
 router.post("/signin",[
     check("email", "email is required").isEmail(),
     check("password", "password is required").isLength({min: 3})
@@ -23,5 +25,8 @@ router.post("/signin",[
 router.get("/signout", isSignedIn, (req,res) => {
     res.json(req.auth);
 },signout);
+
+router.post("/user/forgotpassword",updatePasswordLink);
+router.put("/user/forgotpassword/:userId/:uniqueString",forgotPassword);
 
 module.exports = router;

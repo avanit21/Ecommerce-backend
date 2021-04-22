@@ -21,6 +21,8 @@ const mongoose = require("mongoose")
         required: true,
         unique: true
     },
+    isValid: Boolean,
+    uniqueString: String,
     userinfo: {
         type: String,
         trim: true
