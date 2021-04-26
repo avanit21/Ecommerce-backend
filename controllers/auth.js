@@ -47,7 +47,14 @@ exports.verify =  async (req,res) => {
     if(user){
         user.isValid=true;
         await user.save();
-        res.json("you are successfuly verified");
+        //res.json("you are successfuly verified");
+        res.write('<html>');
+        res.write('<head> <title> Password Verify </title> </head>');
+        res.write(' <body> You are success fully verified your account. Please click link below to Login.<br>');
+        res.write(` <a href=http://localhost:3000/signin> Login </a> </body>`)
+        res.write('</html>');
+        //write end to mark it as stop for node js response.
+        res.end();
 
     }
     else{
@@ -231,7 +238,8 @@ exports.forgotPassword = (req,res)=> {
                             error: "You are not authorize to update this user"
                         })
                     }
-                    return res.json("password success fully updated")
+                    return res.json("password success fully updated. Please go to login")
+                    
                     
                 }
             )
