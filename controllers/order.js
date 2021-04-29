@@ -30,7 +30,7 @@ exports.createOrder = (req,res) => {
 }
 
 exports.getAllOrders = (req,res) => {
-    Order.find().populate("user", "_id name email").exec((err,order) => {
+    Order.find().sort({"createdAt":1}).populate("user", "_id name email").exec((err,order) => {
         if(err){
             res.status(400).json({
                 error: "No orders found"
@@ -79,7 +79,7 @@ exports.updateStatus = (req,res) => {
 
 exports.getUserOrder = (req,res) => {
     const orders=[];
-    Order.find().populate("user").exec((err,order) => {
+    Order.find().sort({"createdAt":1}).populate("user").exec((err,order) => {
         if(err){
             res.status(400).json({
                 error: "No orders found"

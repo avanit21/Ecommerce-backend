@@ -131,7 +131,7 @@ exports.signin = (req, res) => {
         if(!user.isValid)
         {
             return res.status(401).json({
-                error: "You not verify your account.Please Check your mail to verify youe account"
+                error: "You not verify your account.Please Check your mail to verify your account"
             })
         }
 
